@@ -129,6 +129,43 @@ docker build -t ipl-prediction .
 docker run -p 5000:5000 ipl-prediction
 ```
 
+## 🚀 Deploying a permanent public URL (Live preview)
+
+If you want a permanent, shareable link (so others can open the website in their browser anytime), I recommend deploying to a small PaaS like Render or Fly.io. Both can serve a Docker container or a Python web service and will provide a stable HTTP(S) URL.
+
+Below are two simple options.
+
+Option A — Render (recommended, easy GitHub integration)
+
+1. Push this repository to GitHub if it isn't already.
+2. Go to https://render.com and sign up / log in.
+3. Create a new "Web Service" and connect your GitHub repo.
+4. Choose "Docker" as the environment (or "Python" if you prefer). If using Docker, Render will build using the included `Dockerfile`.
+5. For the start command (if Render asks), use the Procfile or set: `gunicorn -w 4 -b 0.0.0.0:$PORT app:app`.
+6. Set the build command to `pip install -r requirements.txt` if not using Docker. Render will provide you with a public URL after deployment.
+
+Option B — Fly.io (good for low-latency global endpoints)
+
+1. Install flyctl: https://fly.io/docs/getting-started/installing-flyctl/
+2. Run `fly launch` from the project directory and follow prompts (choose an app name, region).
+3. Fly will detect Dockerfile and deploy; it gives you a permanent URL like `https://your-app.fly.dev`.
+
+Quick local test
+
+1. Build and run the Docker image locally:
+
+```bash
+docker build -t ipl-prediction .
+docker run -p 5000:5000 ipl-prediction
+```
+
+2. Open `http://localhost:5000`.
+
+Notes and next steps
+
+- I added a `Dockerfile`, `Procfile`, and `.dockerignore`, and ensured `gunicorn` is in `requirements.txt` so the app can be served in production by a WSGI server.
+- If you want, I can: create a `render.yaml` or a GitHub Actions workflow to auto-deploy on push (CI/CD), add HTTPS redirects, or provision a custom domain.
+
 ## 🚀 Usage Guide
 
 ### 1. Start the Web Application
