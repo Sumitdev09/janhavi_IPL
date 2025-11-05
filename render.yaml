@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: janhavi_IPL
+    env: docker
+    repo: https://github.com/Sumitdev09/janhavi_IPL
+    branch: main
+    plan: free
+    dockerfilePath: Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    envVars: []
