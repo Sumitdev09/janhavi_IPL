@@ -166,6 +166,17 @@ Notes and next steps
 - I added a `Dockerfile`, `Procfile`, and `.dockerignore`, and ensured `gunicorn` is in `requirements.txt` so the app can be served in production by a WSGI server.
 - If you want, I can: create a `render.yaml` or a GitHub Actions workflow to auto-deploy on push (CI/CD), add HTTPS redirects, or provision a custom domain.
 
+Important deployment notes
+
+- Health check: I added a `/health` endpoint that returns HTTP 200 so Render (or another PaaS) can check service readiness.
+- PORT handling: When running the app directly (`python app.py`) it now reads the port from the `PORT` environment variable (default 5000). When served with `gunicorn` the `$PORT` binding used in the start command is still required.
+- Model file: the app looks for `IPL_Prediction_Model.pkl` in the repository root. By default I added the filename to `.gitignore` to avoid accidentally committing large model files. If you want to include a trained model in the repo, remove that line from `.gitignore` and commit the file (or upload it as a release asset or external storage and set an env var with the download URL).
+
+Secrets & environment variables
+
+- If you use external services (storage, APIs), set these in Render's Environment Variables section — do NOT commit them to the repo. Example: `MODEL_URL` or any API keys.
+
+
 ## 🚀 Usage Guide
 
 ### 1. Start the Web Application

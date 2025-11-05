@@ -5,9 +5,16 @@ import os
 
 # Try to load model if it exists, otherwise create a dummy one
 model = None
-if os.path.exists('IPL_Prediction_Model.pkl'):
-    import joblib
-    model = joblib.load('IPL_Prediction_Model.pkl')
+# Use repository-relative path for the model file so it works in containers
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'IPL_Prediction_Model.pkl')
+if os.path.exists(MODEL_PATH):
+    try:
+        import joblib
+        model = joblib.load(MODEL_PATH)
+    except Exception as e:
+        # If model fails to load, log and fall back to dummy predictions
+        print(f"⚠️  Failed loading model: {e}. Using dummy predictions for demo purposes.")
+        model = None
 else:
     print("⚠️  Model file not found. Using dummy predictions for demo purposes.")
     print("📝 To create the actual model, run the Prediction.ipynb notebook.")
@@ -18,6 +25,12 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return render_template('index.html')
+
+
+@app.route('/health')
+def health():
+    # Simple health check for PaaS health endpoints
+    return 'OK', 200
 
 def calculate_crr(target_runs, runs_left, balls_left):
     total_runs = target_runs - runs_left
@@ -93,4 +106,6 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0')
+    # When running directly (python app.py) pick up PORT from environment so PaaS can set it.
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
